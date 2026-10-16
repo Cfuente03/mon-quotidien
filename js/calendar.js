@@ -2,6 +2,8 @@
 import { state, save, uid, ymd, parseYmd, hm, MONTHS, DAYS_SHORT, fmtDateLong, $, $$, esc } from './store.js';
 import { openSheet, confirmDialog, toast } from './ui.js';
 import { upsertActivityReminder, removeActivityReminder } from './reminders.js';
+import { getWeather } from './weather.js';
+import { dayTotals } from './nutrition.js';
 
 export const CATS = {
   sport: { label: 'Sport', icon: '🏋️', color: 'var(--c-sport)' },
@@ -45,6 +47,11 @@ export function renderCalendar() {
       </div>
       <div class="ring" style="--p:${todayActs.length ? Math.round((doneCount / todayActs.length) * 100) : 0}"><span>${todayActs.length ? Math.round((doneCount / todayActs.length) * 100) : 0}%</span></div>
     </section>
+    <section class="today-strip">
+      <button class="mini-card" data-go-to="nutrition"><span>🥗</span><b>${Math.round(dayTotals(today).kcal)}</b><small>/ ${state.nutrition.goals.kcal} kcal</small></button>
+      <button class="mini-card" data-go-to="nutrition"><span>💧</span><b>${state.nutrition.days[today]?.water || 0}</b><small>/ ${state.nutrition.goals.water} verres</small></button>
+      <button class="mini-card" data-weather><span>🌡</span><b>—</b><small>Météo</small></button>
+    </section>
 
     <section class="quick-add">
       ${Object.entries(CATS).map(([k, c]) => `<button class="chip-btn" data-quick="${k}" style="--cc:${c.color}"><span>${c.icon}</span>${c.label}</button>`).join('')}
@@ -70,7 +77,15 @@ export function renderCalendar() {
     </section>
     <button class="fab" data-add aria-label="Ajouter une activité">＋</button>`;
 
+  getWeather().then((w) => {
+    const el = root.querySelector('[data-weather]');
+    if (el && w) el.innerHTML = `<span>${w.icon}</span><b>${w.temp}°</b><small>${w.min}° / ${w.max}°${w.rain != null ? ` · ☔ ${w.rain}%` : ''}</small>`;
+    else if (el) el.querySelector('small').textContent = 'Activer la localisation';
+  });
   root.onclick = (e) => {
+    const go = e.target.closest('[data-go-to]')?.dataset.goTo;
+    if (go) return (location.hash = go);
+    if (e.target.closest('[data-weather]') && !e.target.closest('[data-weather] b')?.textContent.includes('°')) return (location.hash = 'perms');
     const t = e.target.closest('[data-nav],[data-day],[data-today],[data-add],[data-quick],[data-act],[data-toggle],[data-workout]');
     if (!t) return;
     if (t.dataset.nav) { cursor.setMonth(cursor.getMonth() + Number(t.dataset.nav)); renderCalendar(); }

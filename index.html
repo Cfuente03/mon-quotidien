@@ -16,22 +16,33 @@
   <link rel="stylesheet" href="css/style.css">
   <script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
 </head>
-<body>
+<body class="locked">
   <header class="topbar">
-    <div class="brand"><img src="icons/icon-192.png" alt=""> Mon Quotidien</div>
+    <button class="icon-btn" data-menu aria-label="Menu">☰</button>
+    <div class="brand"><span data-title>Mon Quotidien</span></div>
     <button class="icon-btn" data-settings aria-label="Réglages">⚙️</button>
   </header>
 
   <main>
     <section class="view" data-view="home"></section>
     <section class="view" data-view="sport" hidden></section>
+    <section class="view" data-view="nutrition" hidden></section>
+    <section class="view" data-view="map" hidden></section>
     <section class="view" data-view="reminders" hidden></section>
+    <section class="view" data-view="jobs" hidden></section>
+    <section class="view" data-view="subs" hidden></section>
+    <section class="view" data-view="perms" hidden></section>
   </main>
+
+  <div class="backdrop" data-backdrop></div>
+  <nav class="drawer" data-drawer aria-label="Menu"></nav>
 
   <nav class="bottom-nav">
     <button data-go="home" class="on"><span>📅</span>Accueil</button>
     <button data-go="sport"><span>🏋️</span>Sport</button>
-    <button data-go="reminders"><span>🔔</span>Rappels</button>
+    <button data-go="nutrition"><span>🥗</span>Nutrition</button>
+    <button data-go="map"><span>🗺</span>Carte</button>
+    <button data-menu><span>☰</span>Menu</button>
   </nav>
 
   <div id="toasts" aria-live="polite"></div>

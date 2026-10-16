@@ -73,3 +73,24 @@ export async function localNotify(title, body, tag) {
     return true;
   } catch (e) { console.warn(e); return false; }
 }
+
+// Chargement à la demande des bibliothèques lourdes
+const loaded = {};
+export function loadScript(src) {
+  return (loaded[src] ||= new Promise((res, rej) => {
+    const s = Object.assign(document.createElement('script'), { src, onload: res, onerror: () => { delete loaded[src]; rej(new Error('Chargement impossible : ' + src)); } });
+    document.head.appendChild(s);
+  }));
+}
+export function loadCss(href) {
+  if (document.querySelector(`link[href="${href}"]`)) return;
+  document.head.appendChild(Object.assign(document.createElement('link'), { rel: 'stylesheet', href }));
+}
+
+export const timeAgo = (t) => {
+  const s = Math.max(0, (Date.now() - new Date(t).getTime()) / 1000);
+  if (s < 3600) return `il y a ${Math.max(1, Math.round(s / 60))} min`;
+  if (s < 86400) return `il y a ${Math.round(s / 3600)} h`;
+  const d = Math.round(s / 86400);
+  return d === 1 ? 'hier' : `il y a ${d} jours`;
+};

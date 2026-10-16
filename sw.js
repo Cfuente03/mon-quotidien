@@ -1,9 +1,11 @@
 // Service worker : fonctionnement hors-ligne + affichage des notifications
-const VERSION = 'mq-v1';
+const VERSION = 'mq-v2';
 const CORE = [
   './', './index.html', './manifest.webmanifest', './css/style.css',
   './js/app.js', './js/store.js', './js/ui.js', './js/calendar.js', './js/sport.js', './js/reminders.js',
-  './js/exercises.js', './js/body3d.js', './js/chart.js',
+  './js/exercises.js', './js/body3d.js', './js/chart.js', './js/config.js', './js/lock.js', './js/permissions.js',
+  './js/nutrition.js', './js/map.js', './js/jobs.js', './js/subs.js', './js/weather.js',
+  './vendor/leaflet/leaflet.js', './vendor/leaflet/leaflet.css', './vendor/zxing.min.js', './vendor/anthropic-sdk.mjs',
   './vendor/three.module.min.js', './vendor/OrbitControls.js', './data/exercises.json',
   './icons/icon-192.png', './icons/icon-512.png', './icons/badge-96.png',
 ];

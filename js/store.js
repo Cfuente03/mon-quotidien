@@ -9,6 +9,11 @@ const defaults = () => ({
   customExercises: [],
   favorites: [],
   reminders: [],
+  nutrition: { days: {}, goals: { kcal: 2200, p: 140, c: 250, f: 70, water: 8 }, recents: [], weights: [] },
+  places: [],
+  jobsState: { fav: [], hidden: [], lastVisit: 0 },
+  subs: [],
+  emails: [],
   settings: { restDefault: 90, ntfyServer: 'https://ntfy.sh', ntfyTopic: '', ntfySent: {}, sound: true },
 });
 
@@ -17,7 +22,7 @@ function load() {
     const raw = JSON.parse(localStorage.getItem(KEY));
     if (raw) {
       const d = defaults();
-      return { ...d, ...raw, settings: { ...d.settings, ...(raw.settings || {}) } };
+      return { ...d, ...raw, settings: { ...d.settings, ...(raw.settings || {}) }, nutrition: { ...d.nutrition, ...(raw.nutrition || {}) }, jobsState: { ...d.jobsState, ...(raw.jobsState || {}) } };
     }
   } catch (e) { console.warn(e); }
   return defaults();

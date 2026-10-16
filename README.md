@@ -1,96 +1,116 @@
-# Mon Quotidien 📅🏋️🔔
+# Mon Quotidien 📅🏋️🥗🗺💼
 
-Application web installable (PWA) pour organiser sa journée :
+Application web installable sur téléphone (PWA), protégée par mot de passe, qui regroupe votre quotidien :
 
-- **Accueil** : calendrier mensuel et activités (Sport, Nourriture avec calories, Événement, Travail, Autre), cases « terminé », progression du jour, rappel optionnel par activité.
-- **Sport** :
-  - 876 exercices avec images (base libre [free-exercise-db](https://github.com/yuhonas/free-exercise-db)), environ 100 noms traduits en français, recherche, filtres par muscle et par équipement, favoris, exercices personnalisés.
-  - Programmes (4 fournis au départ : Push, Pull, Legs, Full body).
-  - Séance en cours : séries avec kg × répétitions, ＋/− série, colonne « précédent », chrono de séance, minuteur de repos (son, vibration et notification), chrono de série.
-  - Bilan : mannequin 3D des muscles travaillés (à faire tourner au doigt), volume, records 🏆, progression ▲ et régression ▼ (1RM estimé).
-  - Historique, records, courbe de progression par exercice, carte musculaire des 7 derniers jours.
-- **Rappels** : ponctuels ou récurrents (tous les jours, du lundi au vendredi, jours choisis), notifications locales, et **push via ntfy** même quand l'app est fermée.
+| Section | Ce qu'elle fait |
+|---|---|
+| 📅 **Accueil** | Calendrier, activités (sport, nourriture, événement, travail), progression du jour, calories, eau, météo |
+| 🏋️ **Sport** | 876 exercices illustrés, séances (kg × reps, séries ±), chronos de séance, de repos et de série, bilan avec mannequin 3D, records, progression et régression |
+| 🥗 **Nutrition** | Scan de code-barres et de QR code (Open Food Facts : Nutri-Score, NOVA, Éco-score, composition), photo d'un repas analysée par IA, recherche, aliments de base, objectifs, eau, poids |
+| 🗺 **Carte** | Recherche d'adresses et de restaurants, lieux à proximité, itinéraire à pied, à vélo ou en voiture avec étapes, ouverture dans Google Maps ou Plans |
+| 🔔 **Rappels** | Rappels ponctuels ou récurrents, notifications push via ntfy |
+| 💼 **Emploi** | Offres récentes (Safran, Dassault, Airbus, Thales…) trouvées par un robot toutes les 30 min, avec une notification par nouvelle offre |
+| 💳 **Abonnements** | Abonnements par adresse e-mail, coût mensuel et annuel, rappel avant chaque prélèvement, aide pour les retrouver dans Gmail |
+| 🔐 **Autorisations** | Caméra, micro (dictée vocale 🎤), localisation, notifications |
 
-Les données restent **sur le téléphone** (localStorage). Vous pouvez les exporter ou les importer depuis ⚙️ Réglages.
+Toutes les sections sont accessibles depuis le **menu ☰**, organisé en groupes dépliables.
+Vos données restent **sur votre téléphone**. Exportez-les régulièrement depuis ⚙️ Réglages.
 
 ---
 
-## 1. Tester sur l'ordinateur
+## 1. Mettre en ligne (GitHub Pages)
 
-```bash
-cd mon-quotidien
-python3 -m http.server 8000
-# puis ouvrir http://localhost:8000
-```
-(Ouvrir directement le fichier `index.html` ne marche pas, car les modules JS ont besoin d'un serveur.)
+1. Envoyez tous les fichiers dans votre dépôt `mon-quotidien` : bouton **Add file → Upload files**, ou `git push`.
+2. **Settings → Pages** → *Deploy from a branch* → branche `main`, dossier `/ (root)` → **Save**.
+3. Après 1 à 2 minutes, l'app est en ligne : `https://<votre-pseudo>.github.io/mon-quotidien/`
 
-## 2. Mettre en ligne gratuitement avec GitHub Pages
+## 2. Installer sur le téléphone
 
-1. Créez un compte sur https://github.com (si besoin).
-2. Créez un nouveau dépôt : **New repository** → nom `mon-quotidien` → **Public** → *Create*.
-3. Envoyez les fichiers, de l'une de ces deux façons :
-   - **Sans ligne de commande** : sur la page du dépôt, cliquez sur **Add file → Upload files** et glissez *tout le contenu* du dossier (`index.html`, `css/`, `js/`, `data/`, `vendor/`, `icons/`, `sw.js`, `manifest.webmanifest`), puis **Commit changes**.
-   - **En ligne de commande** :
-     ```bash
-     git remote add origin https://github.com/<VOTRE-PSEUDO>/mon-quotidien.git
-     git push -u origin main
-     ```
-4. Dans le dépôt : **Settings → Pages** → *Source* : **Deploy from a branch** → branche `main`, dossier `/ (root)` → **Save**.
-5. Une ou deux minutes plus tard, l'app est en ligne à l'adresse :
-   **`https://<VOTRE-PSEUDO>.github.io/mon-quotidien/`**
+- **iPhone (Safari)** : **Partager** ⬆️ → **Sur l'écran d'accueil**, puis ouvrez l'app depuis l'icône (iOS 16.4 minimum pour les notifications).
+- **Android (Chrome)** : menu ⋮ → **Installer l'application**.
 
-Pour une mise à jour, il suffit de pousser (ou d'uploader) les nouveaux fichiers. L'app se met à jour à la prochaine ouverture.
+Ensuite : **☰ → Autorisations** → autorisez la caméra, le micro, la localisation et les notifications.
 
-## 3. Installer sur le téléphone
+## 3. Mot de passe 🔒
 
-**iPhone (Safari obligatoire)**
-1. Ouvrez l'adresse GitHub Pages dans **Safari**.
-2. Touchez **Partager** ⬆️ → **Sur l'écran d'accueil** → *Ajouter*.
-3. Ouvrez l'app **depuis l'icône**, allez dans 🔔 Rappels → **Activer** les notifications (iOS 16.4 minimum).
+- À la **première ouverture**, l'app vous demande de créer votre mot de passe.
+- Il est ensuite redemandé **une fois par mois** sur cet appareil. Vous pouvez choisir « chaque jour » ou « à chaque ouverture » dans ⚙️ Réglages.
+- **Même mot de passe sur tous vos appareils :**
+  1. Allez dans ⚙️ Réglages → « Générer le code pour config.js ».
+  2. Collez le code obtenu dans `js/config.js` (champ `hash`) sur GitHub.
 
-**Android (Chrome)**
-1. Ouvrez l'adresse dans Chrome.
-2. Menu ⋮ → **Installer l'application** (ou ⚙️ Réglages → *Installer* dans l'app).
-3. 🔔 Rappels → **Activer**.
+  Seule une empreinte chiffrée (PBKDF2) est publiée, jamais le mot de passe lui-même.
+- ⚠️ Il n'existe aucune récupération : un oubli impose d'effacer les données de l'app.
 
-L'app fonctionne ensuite en plein écran, avec sa propre icône, et même hors ligne. Les images d'exercices déjà vues sont gardées en cache.
+> Ce que le mot de passe protège : l'accès à l'app et à **vos données**, qui ne quittent jamais votre téléphone. Le code de l'app, lui, est public sur GitHub Pages ; un visiteur qui trouverait l'adresse ne verrait qu'une app vide, verrouillée par *son* propre mot de passe. Il ne voit jamais vos données.
 
-## 4. Notifications push (même app fermée)
+## 4. Notifications push 📲 (rappels et emploi)
 
-Une page web hébergée sur GitHub Pages n'a pas de serveur, donc elle ne peut pas déclencher toute seule une notification quand elle est fermée. La solution intégrée passe par **ntfy** (gratuit, open source) :
+Les notifications passent par **ntfy**, une app gratuite et open source :
+1. Installez **ntfy** ([Android](https://play.google.com/store/apps/details?id=io.heckel.ntfy) / [iPhone](https://apps.apple.com/app/ntfy/id1625396347)).
+2. Dans Mon Quotidien → **Rappels** → « Push même application fermée » → **Générer** un nom de canal → **Enregistrer** → **Envoyer un test**.
+3. Dans ntfy : **＋** → abonnez-vous à ce **même nom**.
 
-1. Installez l'app **ntfy** ([Android](https://play.google.com/store/apps/details?id=io.heckel.ntfy) / [iPhone](https://apps.apple.com/app/ntfy/id1625396347)).
-2. Dans Mon Quotidien → 🔔 Rappels → « Push même application fermée » : **Générer** un nom de canal → **Enregistrer** → **Envoyer un test**.
-3. Dans l'app ntfy : **＋** → abonnez-vous au **même nom de canal**.
+Limites :
+- Les rappels sont programmés 3 jours à l'avance : ouvrez l'app au moins une fois tous les 3 jours.
+- Un rappel déjà programmé ne peut pas être annulé.
 
-L'app programme sur ntfy les rappels des **3 prochains jours** (c'est la limite de ntfy.sh). Ouvrez donc Mon Quotidien au moins une fois tous les 3 jours pour programmer la suite.
-⚠️ Un rappel déjà programmé sur ntfy ne peut pas être annulé : si vous le modifiez ou le supprimez, l'ancienne notification arrivera quand même une fois.
-Gardez le nom du canal secret : toute personne qui le connaît peut lire vos rappels.
+## 5. Alertes emploi 💼 (robot GitHub)
 
-Sans ntfy, les rappels et la fin du temps de repos s'affichent comme notifications locales, mais **seulement si l'app est ouverte ou en arrière-plan récent**.
+Le fichier `.github/workflows/jobs.yml` lance `jobs/check-jobs.mjs` **toutes les 30 minutes** sur les serveurs de GitHub (gratuit). Le robot :
+- récupère les offres récentes ;
+- met à jour `data/jobs.json`, que lit l'onglet Emploi ;
+- envoie une notification ntfy pour chaque **nouvelle** offre, avec l'intitulé, l'entreprise, le type de contrat, le lieu et la date de publication. Toucher la notification ouvre l'offre.
+
+**Activation :**
+1. Sur GitHub : **Settings → Secrets and variables → Actions → New repository secret** :
+   - `NTFY_TOPIC` = un nom de canal ntfy. Il peut être le même que pour les rappels.
+   - `FT_CLIENT_ID` et `FT_CLIENT_SECRET` : accès **gratuit** à l'API officielle **France Travail**, qui couvre aussi les offres de Safran, Dassault, etc. Pour les obtenir :
+     1. Créez un compte sur https://francetravail.io.
+     2. Créez une application (« Mes applications »).
+     3. Abonnez-la à l'API **« Offres d'emploi v2 »**.
+     4. Copiez l'identifiant et la clé secrète.
+2. **Settings → Actions → General** → *Workflow permissions* → **Read and write permissions** → Save.
+3. Onglet **Actions** → « Alertes emploi » → **Run workflow** pour un premier essai. Le journal indique combien d'offres chaque source a trouvées.
+
+**Personnaliser** : modifiez `jobs/config.json` sur GitHub (mots-clés, entreprises, villes, types de contrat, ancienneté maximale).
+
+Sources :
+- **France Travail** (si les clés sont renseignées) ;
+- sites carrières **Workday** d'Airbus et de Thales ;
+- flux **RSS** de votre choix.
+
+Les sites de Safran et de Dassault Aviation n'ont pas d'API publique : leurs offres arrivent par France Travail, et leurs sites carrières sont accessibles en un toucher depuis l'onglet Emploi.
+
+⚠️ **LinkedIn** n'autorise aucune application tierce à lire ses offres ou votre compte (et l'aspiration de son site est interdite par ses conditions). Activez plutôt les **alertes emploi** dans l'app LinkedIn ; l'onglet Emploi ouvre aussi LinkedIn filtré sur les dernières 24 h.
+
+## 6. Photo de repas analysée par IA 🤖
+
+L'onglet Nutrition → **Photo IA** envoie la photo à **Claude** (Anthropic), qui identifie les aliments, estime les grammes, les calories et les macronutriments.
+1. Créez une clé sur https://console.anthropic.com (**API Keys**) et ajoutez un peu de crédit.
+2. Collez-la dans ⚙️ Réglages → « Reconnaissance photo ».
+
+La clé reste sur le téléphone et n'est jamais exportée. Coût : environ 1 à 2 centimes par photo avec Opus 5.5, moins avec Sonnet ou Haiku (choix dans les réglages).
+
+Le **scan de code-barres** (et des QR codes GS1 présents sur les emballages) est gratuit et sans clé : il interroge Open Food Facts.
+
+## 7. Services utilisés (gratuits, sans clé)
+
+OpenStreetMap (fonds de carte), Photon (recherche d'adresses), Overpass (lieux à proximité), OSRM/FOSSGIS (itinéraires), Open-Meteo (météo), Open Food Facts (produits), ntfy (push), free-exercise-db (exercices).
 
 ## Structure
 
 ```
-index.html            page unique + import map three.js
-manifest.webmanifest  métadonnées d'installation (PWA)
-sw.js                 service worker : hors-ligne, cache des images, clic sur les notifications
-css/style.css         styles (thème clair ou sombre automatique)
-js/app.js             navigation, réglages, sauvegarde
-js/store.js           stockage local + utilitaires de dates
-js/calendar.js        onglet Accueil
-js/sport.js           onglet Sport (séance, bilan, historique, progrès)
-js/body3d.js          mannequin 3D (three.js)
-js/exercises.js       base d'exercices + traductions FR
-js/reminders.js       onglet Rappels + ntfy
-data/exercises.json   876 exercices (domaine public)
-vendor/               three.js 0.160 (MIT)
+index.html, manifest.webmanifest, sw.js   page, installation, hors-ligne
+css/style.css                            styles (thème clair/sombre auto)
+js/app.js        navigation, menu, réglages       js/lock.js        mot de passe
+js/config.js     options modifiables sur GitHub   js/permissions.js autorisations + dictée
+js/calendar.js   accueil                          js/weather.js     météo
+js/sport.js      sport (+ body3d.js, exercises.js, chart.js)
+js/nutrition.js  nutrition, scan, IA              js/map.js         carte & itinéraires
+js/reminders.js  rappels + ntfy                   js/jobs.js        onglet emploi
+js/subs.js       abonnements
+jobs/            robot d'alertes emploi (config.json, check-jobs.mjs)
+data/            exercices, offres d'emploi (générées)
+vendor/          three.js, Leaflet, ZXing, SDK Anthropic
 ```
-
-## Idées d'améliorations
-
-- Vrai Web Push (serveur gratuit Cloudflare Worker + clés VAPID), pour se passer de ntfy.
-- Synchronisation entre plusieurs appareils (Supabase ou Firebase).
-- Suivi nutritionnel détaillé (macros, base d'aliments), poids corporel, mensurations.
-- Mannequin 3D plus réaliste (modèle anatomique en .glb).
-- Traduction complète des instructions d'exercices.

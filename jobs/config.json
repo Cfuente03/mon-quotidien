@@ -1,0 +1,25 @@
+{
+  "_aide": "Modifiez ce fichier sur GitHub pour changer vos recherches. Le robot (.github/workflows/jobs.yml) le lit toutes les 30 minutes.",
+  "keywords": ["ingénieur", "aéronautique", "mécanique", "systèmes"],
+  "companies": ["Safran", "Dassault", "Airbus", "Thales", "ArianeGroup", "MBDA", "Stelia", "Latecoere", "Liebherr Aerospace", "Daher"],
+  "onlyListedCompanies": true,
+  "locations": [],
+  "contracts": [],
+  "maxAgeDays": 14,
+  "maxNotificationsPerRun": 8,
+  "sources": {
+    "franceTravail": { "enabled": true, "searches": ["aéronautique", "Safran", "Dassault Aviation", "Airbus", "Thales"] },
+    "workday": [
+      { "company": "Airbus", "api": "https://ag.wd3.myworkdayjobs.com/wday/cxs/ag/Airbus/jobs", "site": "https://ag.wd3.myworkdayjobs.com/Airbus", "searchText": "France" },
+      { "company": "Thales", "api": "https://thales.wd3.myworkdayjobs.com/wday/cxs/thales/Careers/jobs", "site": "https://thales.wd3.myworkdayjobs.com/Careers", "searchText": "France" }
+    ],
+    "rss": []
+  },
+  "careerPages": [
+    { "company": "Safran", "url": "https://www.safran-group.com/fr/offres" },
+    { "company": "Dassault Aviation", "url": "https://carriere.dassault-aviation.com" },
+    { "company": "Airbus", "url": "https://ag.wd3.myworkdayjobs.com/Airbus" },
+    { "company": "Thales", "url": "https://careers.thalesgroup.com/fr/fr" },
+    { "company": "ArianeGroup", "url": "https://www.ariane.group/fr/carrieres/" }
+  ]
+}
