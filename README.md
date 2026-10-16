@@ -5,12 +5,12 @@ Application web installable sur téléphone (PWA), protégée par mot de passe, 
 | Section | Ce qu'elle fait |
 |---|---|
 | 📅 **Accueil** | Calendrier, activités (sport, nourriture, événement, travail), progression du jour, calories, eau, météo |
-| 🏋️ **Sport** | 876 exercices illustrés, séances (kg × reps, séries ±), chronos de séance, de repos et de série, bilan avec mannequin 3D, records, progression et régression |
+| 🏋️ **Sport** | Mannequin 3D anatomique + carte des muscles, arbre de compétences, radar forces/faiblesses, badges, liens vidéo YouTube, 876 exercices illustrés, séances (kg × reps, séries ±), chronos de séance, de repos et de série, bilan avec mannequin 3D, records, progression et régression |
 | 🥗 **Nutrition** | Scan de code-barres et de QR code (Open Food Facts : Nutri-Score, NOVA, Éco-score, composition), photo d'un repas analysée par IA, recherche, aliments de base, objectifs, eau, poids |
 | 🗺 **Carte** | Recherche d'adresses et de restaurants, lieux à proximité, itinéraire à pied, à vélo ou en voiture avec étapes, ouverture dans Google Maps ou Plans |
 | 🔔 **Rappels** | Rappels ponctuels ou récurrents, notifications push via ntfy |
 | 💼 **Emploi** | Offres récentes (Safran, Dassault, Airbus, Thales…) trouvées par un robot toutes les 30 min, avec une notification par nouvelle offre |
-| 💳 **Abonnements** | Abonnements par adresse e-mail, coût mensuel et annuel, rappel avant chaque prélèvement, aide pour les retrouver dans Gmail |
+| 💳 **Abonnements** | Détection auto (relevé bancaire, Gmail), conseils d'économie, flux mensuels, abonnements par adresse e-mail, coût mensuel et annuel, rappel avant chaque prélèvement, aide pour les retrouver dans Gmail |
 | 🔐 **Autorisations** | Caméra, micro (dictée vocale 🎤), localisation, notifications |
 
 Toutes les sections sont accessibles depuis le **menu ☰**, organisé en groupes dépliables.
@@ -62,16 +62,19 @@ Le fichier `.github/workflows/jobs.yml` lance `jobs/check-jobs.mjs` **toutes les
 - met à jour `data/jobs.json`, que lit l'onglet Emploi ;
 - envoie une notification ntfy pour chaque **nouvelle** offre, avec l'intitulé, l'entreprise, le type de contrat, le lieu et la date de publication. Toucher la notification ouvre l'offre.
 
-**Activation :**
-1. Sur GitHub : **Settings → Secrets and variables → Actions → New repository secret** :
-   - `NTFY_TOPIC` = un nom de canal ntfy. Il peut être le même que pour les rappels.
-   - `FT_CLIENT_ID` et `FT_CLIENT_SECRET` : accès **gratuit** à l'API officielle **France Travail**, qui couvre aussi les offres de Safran, Dassault, etc. Pour les obtenir :
-     1. Créez un compte sur https://francetravail.io.
-     2. Créez une application (« Mes applications »).
-     3. Abonnez-la à l'API **« Offres d'emploi v2 »**.
-     4. Copiez l'identifiant et la clé secrète.
-2. **Settings → Actions → General** → *Workflow permissions* → **Read and write permissions** → Save.
-3. Onglet **Actions** → « Alertes emploi » → **Run workflow** pour un premier essai. Le journal indique combien d'offres chaque source a trouvées.
+**Activation (guide aussi dans l'app : Emploi → ⚙️ Activer les alertes) :**
+
+A. Clés France Travail (gratuit). ⚠️ Pas l'espace candidat : le site **développeurs**.
+1. https://francetravail.io → **Se connecter / Créer un compte**.
+2. **Mon espace** → **Créer une application** (nom : Mon Quotidien).
+3. Dans l'application : ajoutez l'API **« Offres d'emploi v2 »**.
+4. Notez l'**Identifiant client** et la **Clé secrète**.
+
+B. Les donner au robot (GitHub).
+1. Dépôt → **Settings → Secrets and variables → Actions → New repository secret**. Créez 3 secrets :
+   `FT_CLIENT_ID` (identifiant), `FT_CLIENT_SECRET` (clé), `NTFY_TOPIC` (votre canal ntfy).
+2. **Settings → Actions → General** → *Read and write permissions* → **Save**.
+3. **Actions → Alertes emploi → Run workflow**. Coche verte ✓ = c'est bon.
 
 **Personnaliser** : modifiez `jobs/config.json` sur GitHub (mots-clés, entreprises, villes, types de contrat, ancienneté maximale).
 
@@ -94,9 +97,19 @@ La clé reste sur le téléphone et n'est jamais exportée. Coût : environ 1 à
 
 Le **scan de code-barres** (et des QR codes GS1 présents sur les emballages) est gratuit et sans clé : il interroge Open Food Facts.
 
-## 7. Services utilisés (gratuits, sans clé)
+## 7. Abonnements : détection automatique
 
-OpenStreetMap (fonds de carte), Photon (recherche d'adresses), Overpass (lieux à proximité), OSRM/FOSSGIS (itinéraires), Open-Meteo (météo), Open Food Facts (produits), ntfy (push), free-exercise-db (exercices).
+- **Relevé bancaire** (recommandé) : site/appli de votre banque → Comptes → **Exporter** (CSV ou OFX, 12 mois) → Abonnements → 🏦. Détecte les prélèvements récurrents (Netflix, Canal+, Crunchyroll…), les hausses de prix, et trace vos flux mensuels (entrées, sorties, virements). Le fichier reste sur le téléphone.
+- **Gmail** : bouton ✉️. Une seule configuration (5 min, guide dans l'app) : un « ID client » Google gratuit. Lecture seule.
+- 💡 Conseils d'économie calculés automatiquement.
+
+## 8. Mise à jour de l'app
+
+Ré-uploadez les fichiers sur GitHub (remplacer). Vos données et votre mot de passe restent sur le téléphone : rien à refaire. Fermez/rouvrez l'app pour charger la nouvelle version.
+
+## 9. Services utilisés (gratuits, sans clé)
+
+OpenStreetMap (fonds de carte), Photon (recherche d'adresses), Overpass (lieux à proximité), OSRM/FOSSGIS (itinéraires), Open-Meteo (météo), Open Food Facts (produits), ntfy (push), free-exercise-db (exercices), body-muscles (carte anatomique, Apache-2.0).
 
 ## Structure
 

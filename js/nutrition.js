@@ -2,7 +2,7 @@
 import { state, save, uid, ymd, parseYmd, fmtDateLong, $, $$, esc } from './store.js';
 import { openSheet, toast, loadScript, confirmDialog } from './ui.js';
 import { attachVoice } from './permissions.js';
-import { lineChart } from './chart.js';
+import { lineChart, barChart } from './chart.js';
 
 const MEALS = { breakfast: '🥐 Petit-déjeuner', lunch: '🍝 Déjeuner', snack: '🍎 Collation', dinner: '🍲 Dîner' };
 const OFF = 'https://world.openfoodfacts.org';
@@ -24,7 +24,7 @@ const BASICS = [
   ['Coca-Cola (100 ml)', 42, 0, 10.6, 0], ['Jus d\'orange (100 ml)', 45, 0.7, 10, 0.1], ['Bière (100 ml)', 43, 0.4, 3.5, 0], ['Vin rouge (100 ml)', 85, 0.1, 2.6, 0],
 ].map(([name, kcal, p, c, f]) => ({ name, per100: { kcal, p, c, f }, source: 'Aliment de base' }));
 
-let root, day = ymd();
+let root, day = ymd(), span = 14;
 const N = () => state.nutrition;
 const dayData = (d = day) => (N().days[d] ||= { entries: [], water: 0 });
 const r1 = (v) => Math.round(v * 10) / 10;
@@ -68,10 +68,11 @@ export function renderNutrition(el) {
               <div class="small muted">${Math.round(e.grams)} g · P ${r1(v.p)} · G ${r1(v.c)} · L ${r1(v.f)}</div></div>
             <b class="small">${Math.round(v.kcal)}<small class="muted"> kcal</small></b></article>`; }).join('') || '<div class="small muted pad">—</div>'}</div></section>`;
     }).join('')}
+    ${trendsCard()}
     ${weightCard()}`;
 
   root.onclick = (e) => {
-    const t = e.target.closest('[data-day],[data-water],[data-scan],[data-photo],[data-search],[data-manual],[data-addmeal],[data-entry],[data-goals],[data-weight]');
+    const t = e.target.closest('[data-span],[data-day],[data-water],[data-scan],[data-photo],[data-search],[data-manual],[data-addmeal],[data-entry],[data-goals],[data-weight]');
     if (!t) return;
     const d = t.dataset;
     if (d.day) { const x = parseYmd(day); x.setDate(x.getDate() + Number(d.day)); day = ymd(x); renderNutrition(); }
@@ -83,8 +84,25 @@ export function renderNutrition(el) {
     else if (d.entry) editEntry(dd.entries.find((x) => x.id === d.entry));
     else if (d.goals !== undefined) editGoals();
     else if (d.weight !== undefined) addWeight();
+    else if (d.span) { span = Number(d.span); renderNutrition(); }
   };
   $('[data-photo-input]', root).onchange = (e) => { const f = e.target.files[0]; e.target.value = ''; if (f) analysePhoto(f); };
+}
+
+// Tendances : calories par jour, réparties en protéines / glucides / lipides
+const MC = { p: '#ff7a45', c: '#4fa8ff', f: '#f5c542' };
+function trendsCard() {
+  const g = N().goals, days = [];
+  for (let i = span - 1; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); days.push(ymd(d)); }
+  const tots = days.map((d) => ({ d, ...dayTotals(d) }));
+  const logged = tots.filter((t) => t.kcal > 0);
+  const avg = (k) => (logged.length ? logged.reduce((s, t) => s + t[k], 0) / logged.length : 0);
+  const bars = tots.map((t) => ({ label: `${parseYmd(t.d).getDate()}/${parseYmd(t.d).getMonth() + 1}`, parts: [{ v: t.p * 4, color: MC.p }, { v: t.c * 4, color: MC.c }, { v: t.f * 9, color: MC.f }] }));
+  const row = (l, k, goal, c) => { const v = avg(k), pct = Math.round((v / (goal || 1)) * 100); return `<div class="macro"><div class="row between small"><span>${l}</span><span><b>${Math.round(v)}</b> g/j · ${pct}%</span></div><i style="--v:${Math.min(1, pct / 100)};--mc:${c}"></i></div>`; };
+  return `<section class="card mt"><div class="row between"><b>📊 Tendances</b><div class="seg2 small-seg">${[7, 14, 30].map((n) => `<button data-span="${n}" class="${n === span ? 'on' : ''}">${n} j</button>`).join('')}</div></div>
+    ${barChart(bars, { unit: 'kcal', goal: g.kcal, legend: [['Protéines', MC.p], ['Glucides', MC.c], ['Lipides', MC.f]] })}
+    ${logged.length ? `<p class="small muted">Moyenne sur ${logged.length} jour${logged.length > 1 ? 's' : ''} saisi${logged.length > 1 ? 's' : ''} : <b>${Math.round(avg('kcal'))} kcal</b> / ${g.kcal}</p>
+    <div class="macros">${row('Protéines', 'p', g.p, MC.p)}${row('Glucides', 'c', g.c, MC.c)}${row('Lipides', 'f', g.f, MC.f)}</div>` : ''}</section>`;
 }
 
 function weightCard() {

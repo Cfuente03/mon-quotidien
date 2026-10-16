@@ -14,6 +14,7 @@ const defaults = () => ({
   jobsState: { fav: [], hidden: [], lastVisit: 0 },
   subs: [],
   emails: [],
+  bank: { tx: [], gmail: [], imported: 0 },
   settings: { restDefault: 90, ntfyServer: 'https://ntfy.sh', ntfyTopic: '', ntfySent: {}, sound: true },
 });
 
@@ -22,7 +23,7 @@ function load() {
     const raw = JSON.parse(localStorage.getItem(KEY));
     if (raw) {
       const d = defaults();
-      return { ...d, ...raw, settings: { ...d.settings, ...(raw.settings || {}) }, nutrition: { ...d.nutrition, ...(raw.nutrition || {}) }, jobsState: { ...d.jobsState, ...(raw.jobsState || {}) } };
+      return { ...d, ...raw, settings: { ...d.settings, ...(raw.settings || {}) }, nutrition: { ...d.nutrition, ...(raw.nutrition || {}) }, jobsState: { ...d.jobsState, ...(raw.jobsState || {}) }, bank: { ...d.bank, ...(raw.bank || {}) } };
     }
   } catch (e) { console.warn(e); }
   return defaults();

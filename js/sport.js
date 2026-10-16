@@ -3,6 +3,7 @@ import { state, save, uid, fmtDur, fmtDateLong, ymd, $, $$, esc } from './store.
 import { openSheet, confirmDialog, toast, beep, vibrate, localNotify, unlockAudio } from './ui.js';
 import { loadExercises, searchExercises, getEx, addCustomExercise, MUSCLES_FR, EQUIP_FR, CAT_FR, isCardio } from './exercises.js';
 import { lineChart } from './chart.js';
+import { renderSkillsSection } from './skills.js';
 import { logWorkoutActivity } from './calendar.js';
 
 let root, tab = 'session', ticker, restTimeout, bodyView;
@@ -298,7 +299,8 @@ function exerciseCard(x, i) {
       <div class="grow">
         <div class="item-title">${esc(ex.label)}</div>
         <div class="small muted">${ex.primaryMuscles.map((m) => MUSCLES_FR[m] || m).join(', ')}${ex.equipment ? ' · ' + (EQUIP_FR[ex.equipment] || ex.equipment) : ''}</div>
-        ${cardio ? '' : `<button class="link small" data-restset="${i}">⏱ Repos ${x.rest || state.settings.restDefault}s</button>`}
+        <div class="row gap">${cardio ? '' : `<button class="link small" data-restset="${i}">⏱ Repos ${x.rest || state.settings.restDefault}s</button>`}
+          <a class="link small" href="https://www.youtube.com/results?search_query=${encodeURIComponent((ex.nameFr || ex.name) + (ex.nameFr ? ' exercice technique' : ' exercise form'))}" target="_blank" rel="noopener">▶️ Vidéo</a></div>
       </div>
       <button class="icon-btn" data-exmenu="${i}" aria-label="Options">⋯</button>
     </header>
@@ -378,7 +380,7 @@ export function showSummary(id, fresh = false) {
         <div><b>${totals.sets}</b><small>Séries</small></div>
         <div><b>${prCount}</b><small>Records 🏆</small></div>
       </div>
-      <div class="body3d" data-body></div>
+      <div data-body></div>
       <p class="center small muted">Glissez pour tourner · touchez un muscle</p>
       ${muscleBars(load)}
       <h3>Exercices</h3>
@@ -413,10 +415,36 @@ export function showSummary(id, fresh = false) {
   }, { full: true, onClose: () => body3d?.then((b) => b?.dispose()) });
 }
 
+// Visionneuse : mannequin 3D ou carte anatomique 2D, vue de face ou de dos
 async function mountBody3d(el, load) {
   if (!el) return null;
-  try { const { mountBody } = await import('./body3d.js'); return mountBody(el, load); }
-  catch (e) { console.error(e); el.innerHTML = '<div class="empty small">Affichage 3D indisponible sur cet appareil.</div>'; return null; }
+  let mode = localStorage.getItem('mq-viewer') || '3d', side = 'front', view3d;
+  el.innerHTML = `<div class="viewer-bar"><div class="seg2" data-m><button data-v="3d">3D</button><button data-v="map">Carte</button></div>
+    <div class="seg2" data-s><button data-v="front" class="on">Face</button><button data-v="back">Dos</button></div></div><div data-stage></div>`;
+  const stage = $('[data-stage]', el);
+  const draw = async () => {
+    view3d?.dispose(); view3d = null;
+    $$('[data-m] button', el).forEach((b) => b.classList.toggle('on', b.dataset.v === mode));
+    $('[data-s]', el).style.visibility = mode === '3d' ? 'visible' : 'hidden';
+    if (mode === 'map') { const { renderBodyMap } = await import('./bodymap.js'); return renderBodyMap(stage, load); }
+    stage.className = 'body3d';
+    try { const { mountBody } = await import('./body3d.js'); view3d = await mountBody(stage, load); if (side === 'back') view3d.setSide('back'); }
+    catch (e) { console.error(e); mode = 'map'; draw(); }
+  };
+  el.onclick = (e) => {
+    const b = e.target.closest('[data-v]'); if (!b) return;
+    if (b.parentElement.matches('[data-m]')) { mode = b.dataset.v; try { localStorage.setItem('mq-viewer', mode); } catch {} stage.className = ''; draw(); }
+    else { side = b.dataset.v; $$('[data-s] button', el).forEach((x) => x.classList.toggle('on', x === b)); view3d?.setSide(side); }
+  };
+  await draw();
+  return { dispose: () => view3d?.dispose() };
+}
+
+// Liens vers des vidéos de démonstration
+export function videoLinks(ex) {
+  const q = encodeURIComponent(ex.nameFr ? `${ex.nameFr} exercice technique` : `${ex.name} exercise form`);
+  return `<div class="vid-links"><a class="btn ghost small" href="https://www.youtube.com/results?search_query=${q}" target="_blank" rel="noopener">▶️ YouTube</a>
+    <a class="btn ghost small" href="https://www.google.com/search?tbm=vid&q=${q}" target="_blank" rel="noopener">🔎 Vidéos Google</a></div>`;
 }
 
 function muscleBars(load) {
@@ -465,8 +493,9 @@ function renderProgress(pane) {
       <div><b>${streak}</b><small>Jours d'affilée</small></div>
     </div>
     <h3>Muscles travaillés — 7 derniers jours</h3>
-    <div class="body3d" data-body></div>
+    <div data-body></div>
     ${muscleBars(muscleLoad(week)) || '<div class="empty small">Aucune séance cette semaine.</div>'}
+    ${renderSkillsSection()}
     <h3>Mes records</h3>
     <div class="list">${records.map((r) => `
       <article class="item" data-info="${r.id}">
@@ -490,6 +519,7 @@ function showExercise(id) {
     body.innerHTML = `
       ${ex.images?.length ? `<div class="ex-hero">${ex.images.map((src) => `<img src="${src}" alt="" loading="lazy">`).join('')}</div>` : ''}
       ${ex.nameFr ? `<p class="small muted">${esc(ex.name)}</p>` : ''}
+      ${videoLinks(ex)}
       <div class="tags">${ex.primaryMuscles.map((m) => `<span class="pill strong">${MUSCLES_FR[m] || m}</span>`).join('')}${(ex.secondaryMuscles || []).map((m) => `<span class="pill">${MUSCLES_FR[m] || m}</span>`).join('')}
         ${ex.equipment ? `<span class="pill">${EQUIP_FR[ex.equipment] || ex.equipment}</span>` : ''}${ex.level ? `<span class="pill">${{ beginner: 'Débutant', intermediate: 'Intermédiaire', expert: 'Expert' }[ex.level]}</span>` : ''}
         ${ex.category ? `<span class="pill">${CAT_FR[ex.category] || ex.category}</span>` : ''}</div>
